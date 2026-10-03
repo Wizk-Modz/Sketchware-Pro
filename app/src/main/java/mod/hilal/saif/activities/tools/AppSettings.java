@@ -278,23 +278,23 @@ public class AppSettings extends BaseAppCompatActivity {
                 ApkSigner.LogCallback callback = line -> runOnUiThread(() ->
                         tv_log.setText(Helper.getText(tv_log) + line));
 
-                if (useTestkey) {
-                    signer.signWithTestKey(inputApkPath, outputApkPath, callback);
-                } else {
-                    signer.signWithKeyStore(inputApkPath, outputApkPath,
-                            keyStorePath, keyStorePassword, keyStoreKeyAlias, keyPassword, callback);
-                }
+                try {
+                    if (useTestkey) {
+                        signer.signWithTestKey(inputApkPath, outputApkPath, callback);
+                    } else {
+                        signer.signWithKeyStore(inputApkPath, outputApkPath,
+                                keyStorePath, keyStorePassword, keyStoreKeyAlias, keyPassword, callback);
+                    }
 
-                runOnUiThread(() -> {
-                    if (ApkSigner.LogCallback.errorCount.get() == 0) {
+                    runOnUiThread(() -> {
                         building_dialog.dismiss();
                         SketchwareUtil.toast("Successfully saved signed APK to: /Internal storage/sketchware/signed_apk/"
                                         + Uri.fromFile(new File(outputApkPath)).getLastPathSegment(),
                                 Toast.LENGTH_LONG);
-                    } else {
-                        tv_progress.setText("An error occurred. Check the log for more details.");
-                    }
-                });
+                    });
+                } catch (Exception e) {
+                    runOnUiThread(() -> tv_progress.setText("An error occurred. Check the log for more details."));
+                }
             }
         }.start();
 

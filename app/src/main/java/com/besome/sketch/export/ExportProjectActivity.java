@@ -43,6 +43,7 @@ import a.a.a.yq;
 import kellinwood.security.zipsigner.ZipSigner;
 import kellinwood.security.zipsigner.optional.CustomKeySigner;
 import kellinwood.security.zipsigner.optional.LoadKeystoreException;
+import mod.alucard.tn.apksigner.ApkSigner;
 import mod.hey.studios.compiler.kotlin.KotlinCompilerBridge;
 import mod.hey.studios.project.proguard.ProguardHandler;
 import mod.hey.studios.project.stringfog.StringfogHandler;
@@ -334,9 +335,8 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
             confirmationDialog.setMessage("""
                     To sign an APK, you need a keystore. Use your already created one, and copy it to \
                     /Internal storage/sketchware/keystore/release_key.jks and enter the alias's password.
-                    
-                    Note that this only signs your APK using signing scheme V1, to target Android 11+ for example, \
-                    use a 3rd-party tool (for now).""");
+
+                    Your APK will be signed using signing schemes V1, V2 and V3.""");
             confirmationDialog.setIcon(R.drawable.ic_mtrl_info);
 
             confirmationDialog.setPositiveButton("Understood", (v, which) -> {
@@ -659,16 +659,14 @@ public class ExportProjectActivity extends BaseAppCompatActivity {
                     if (signWithTestkey) {
                         TestkeySignBridge.signWithTestkey(builder.yq.unsignedAlignedApkPath, outputLocation);
                     } else if (isResultJarSigningEnabled()) {
-                        Security.addProvider(new BouncyCastleProvider());
-                        CustomKeySigner.signZip(
-                                new ZipSigner(),
-                                wq.j(),
-                                signingKeystorePassword,
-                                signingAliasName,
-                                signingKeystorePassword,
-                                signingAlgorithm,
+                        new ApkSigner().signWithKeyStore(
                                 builder.yq.unsignedAlignedApkPath,
-                                outputLocation
+                                outputLocation,
+                                wq.j(),
+                                new String(signingKeystorePassword),
+                                signingAliasName,
+                                new String(signingAliasPassword),
+                                null
                         );
                     } else {
                         FileUtil.copyFile(builder.yq.unsignedAlignedApkPath, outputLocation);
