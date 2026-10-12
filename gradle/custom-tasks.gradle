@@ -1,5 +1,6 @@
 /**
- * Creates a mock google-services.json if GOOGLE_SERVICES_JSON environment variable is absent.
+ * Writes google-services.json from the GOOGLE_SERVICES_JSON environment variable,
+ * or a mock one when that variable is absent, so builds never require the real file.
  */
 tasks.register('createMockGoogleServices') {
     doLast {
@@ -8,13 +9,12 @@ tasks.register('createMockGoogleServices') {
             new File("$projectDir/google-services.json").text = secrets
             return
         }
-        def rootMockFile = file("google-services.json")
-        if (rootMockFile.exists() && rootMockFile.length() == 0) {
-            rootMockFile.delete()
+        /* The Google Services plugin reads google-services.json from the module root for every variant */
+        def mockFile = file("google-services.json")
+        if (mockFile.exists() && mockFile.length() == 0) {
+            mockFile.delete()
         }
-        def mockFile = file("src/debug/google-services.json")
         if (!mockFile.exists()) {
-            mockFile.parentFile.mkdirs()
             def mockContent = """{
   "project_info": {
     "project_number": "123456789000",
